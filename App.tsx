@@ -1,10 +1,10 @@
 import React from 'react';
-import { NativeBaseProvider, Center, StatusBar, Box } from "native-base";
-import { Home } from './src/pages/Home';
+import { NativeBaseProvider, StatusBar, Box } from "native-base";
 import { useFonts } from 'expo-font';
 import { Roboto_400Regular, Roboto_700Bold, Roboto_700Bold_Italic } from "@expo-google-fonts/roboto";
 import { Spinner } from './src/components/Loader';
 import { THEME } from './src/styles/theme';
+import { Routes } from './src/Routes';
 
 export default function App() {
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold, Roboto_700Bold_Italic });
@@ -20,11 +20,8 @@ export default function App() {
       />
       <Box 
         flex={1}
-        bg="gray.700"
-        px={4}
-        pt={10}
       >
-        { fontsLoaded ? <Home /> : <Spinner />}
+        { fontsLoaded ? <Routes /> : <Spinner />}
       </Box>
     </NativeBaseProvider>
   );  
