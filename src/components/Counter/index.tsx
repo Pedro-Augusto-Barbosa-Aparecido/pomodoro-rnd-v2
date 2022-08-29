@@ -7,17 +7,15 @@ interface ITimerProps {
 
 export function Counter ({ minute, seconds }: ITimerProps) {
   return (
-    <Box
-    
-    >
-      <HStack
-      
-      >
+    <Box>
+      <HStack>
         <Text
           fontSize={"8xl"}
           fontFamily={"body"}
           color="gray.200"
           mt={12}
+          alignItems="center"
+          textAlign={"center"}
         >
           {minute}
           <Text
