@@ -17,7 +17,7 @@ interface TimerCreateParams {
 interface TimerContextType {
   timers: Timer[];
   timer: Timer | null;
-  createTimer: (timer: TimerCreateParams) => void;
+  createTimer: (timer: TimerCreateParams) => string;
 }
 
 export const TimerContext = createContext({} as TimerContextType);
@@ -30,11 +30,12 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
   const [timers, setTimers] = useState<Timer[]>([]);
   const [timer, setTimer] = useState<Timer | null>(null);
 
-  const createTimer = ({ projectName, task }: TimerCreateParams) => {
+  function createTimer ({ projectName, task }: TimerCreateParams) {
+    const id = uuid();
     setTimer(() => {
       const timer: Timer = {
         created: new Date(),
-        id: uuid(),
+        id,
         project: projectName,
         task
       }
@@ -43,6 +44,9 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
 
       return timer;
     });
+
+    return id;
+
   };
 
   return (

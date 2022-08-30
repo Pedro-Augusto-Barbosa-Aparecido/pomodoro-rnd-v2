@@ -1,4 +1,4 @@
-import { Center, FormControl, Heading, Icon, Text, useTheme, VStack } from "native-base";
+import { Box, Center, FormControl, Heading, HStack, Icon, Text, useTheme, VStack } from "native-base";
 import { Activity } from "phosphor-react-native";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "../../components/Button";
@@ -14,6 +14,9 @@ export function Home () {
   const [task, setTask] = useState<string>("");
   const [timer, setTimer] = useState<number>(0);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timer>();
+  const [isStartButton, setIsStartButton] = useState<boolean>(true);
+  const [idCurrentTimer, setIdCurrentTimer] = useState<string>("");
+  const [isPause, setIsPause] = useState<boolean>(true);
 
   const { createTimer } = useContext(TimerContext);
 
@@ -37,10 +40,37 @@ export function Home () {
   };
 
   const handleCreateTimer = () => {
-    createTimer({
-      projectName, 
-      task
-    });
+    if (timer == 0) {
+      clearAll();
+      const id = createTimer({
+        projectName, 
+        task
+      });
+      setIdCurrentTimer(id);
+      playTimer();
+    } else {
+      playTimer();
+    }
+    setIsStartButton(false);
+  };
+
+  const handleStopTimer = () => {
+    clearTimer();
+    setIsStartButton(true);
+    setTimer(0);
+  };
+
+  const handlePauseTimer = () => {
+    setIsPause(state => {
+      if (state) {
+        clearTimer();
+      } else {
+        playTimer();
+      }
+
+      return !state;
+    })
+    
   };
 
   const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
@@ -83,18 +113,63 @@ export function Home () {
             value={task}
             onChangeText={setTask}
           />
-          <Button
-            mt={4}
-            shadow="4"
-            onPress={handleCreateTimer}
-          >
-            <Text
-              fontFamily={"body"}
-              fontSize="lg"
-              color={"gray.100"}
-              fontWeight="bold"
-            >Start Timer</Text>
-          </Button>
+          {
+            isStartButton ? 
+            <Button
+              mt={4}
+              shadow="4"
+              onPress={handleCreateTimer}
+            >
+              <Text
+                fontFamily={"body"}
+                fontSize="lg"
+                color={"gray.100"}
+                fontWeight="bold"
+              >Start Timer</Text>
+            </Button> :
+            (
+              <Box
+                w={"full"}
+              >
+                <Button
+                  mt={4}
+                  shadow="4"
+                  onPress={handleStopTimer}
+                  bg="red.600"
+                  _pressed={{
+                    backgroundColor: "red.500"
+                  }}
+                >
+                  <Text
+                    fontFamily={"body"}
+                    fontSize="lg"
+                    color={"gray.100"}
+                    fontWeight="bold"
+                  >
+                    Stop Timer
+                  </Text>
+                </Button>
+                <Button
+                  mt={4}
+                  shadow="4"
+                  onPress={handlePauseTimer}
+                  bg="red.600"
+                  _pressed={{
+                    backgroundColor: "red.500"
+                  }}
+                >
+                  <Text
+                    fontFamily={"body"}
+                    fontSize="lg"
+                    color={"gray.100"}
+                    fontWeight="bold"
+                  >
+                    {isPause ? "Pause" : "Continue"} Timer
+                  </Text>
+                </Button>
+              </Box>
+            )
+          }
           <Counter 
             minute={minutes}
             seconds={seconds}
