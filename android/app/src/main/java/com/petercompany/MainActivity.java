@@ -1,4 +1,4 @@
-package com.timer;
+package com.petercompany;
 
 import android.os.Build;
 import android.os.Bundle;
