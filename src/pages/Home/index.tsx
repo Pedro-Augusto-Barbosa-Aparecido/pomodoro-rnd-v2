@@ -15,7 +15,7 @@ export function Home () {
   const [timer, setTimer] = useState<number>(0);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timer>();
   const [isStartButton, setIsStartButton] = useState<boolean>(true);
-  const [idCurrentTimer, setIdCurrentTimer] = useState<string>("");
+  const [idCurrentTimer, setIdCurrentTimer] = useState<number | null>(null);
   const [isPause, setIsPause] = useState<boolean>(true);
 
   const { createTimer } = useContext(TimerContext);
@@ -42,6 +42,7 @@ export function Home () {
   const handleCreateTimer = () => {
     if (timer == 0) {
       clearAll();
+      console.log(typeof createTimer)
       const id = createTimer({
         projectName, 
         task
