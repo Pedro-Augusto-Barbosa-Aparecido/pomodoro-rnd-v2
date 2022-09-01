@@ -1,5 +1,4 @@
 import React, { createContext, useState } from "react";
-import { v4 as uuid } from "uuid";
 
 type Timer = {
   project: string;

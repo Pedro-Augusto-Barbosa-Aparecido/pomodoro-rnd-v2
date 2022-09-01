@@ -1,4 +1,4 @@
-import { Box, Center, FormControl, Heading, HStack, Icon, Text, useTheme, VStack } from "native-base";
+import { Box, Center, Heading, Icon, Text, useTheme, VStack } from "native-base";
 import { Activity } from "phosphor-react-native";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "../../components/Button";
@@ -6,6 +6,9 @@ import { Container } from "../../components/Container";
 import { Input } from "../../components/Inputs";
 import { TimerContext } from "../../context/TimerContext";
 import { Counter } from "../../components/Counter";
+import { Alert } from "react-native";
+
+import firestore from "@react-native-firebase/firestore";
 
 export function Home () {
   const { colors } = useTheme();
@@ -17,6 +20,7 @@ export function Home () {
   const [isStartButton, setIsStartButton] = useState<boolean>(true);
   const [idCurrentTimer, setIdCurrentTimer] = useState<number | null>(null);
   const [isPause, setIsPause] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { createTimer } = useContext(TimerContext);
 
@@ -42,17 +46,33 @@ export function Home () {
   const handleCreateTimer = () => {
     if (timer == 0) {
       clearAll();
-      console.log(typeof createTimer)
-      const id = createTimer({
-        projectName, 
-        task
+      setIsLoading(true);
+      firestore()
+      .collection("timer")
+      .add({
+        projectName,
+        task,
+        id: Date.now(),
+        status: "in-progress",
+        createdAt: firestore.FieldValue.serverTimestamp()
+      })
+      .then((data) => {
+        console.log(data.id);
+        setIdCurrentTimer(createTimer({
+          projectName,
+          task
+        }));
+        Alert.alert("Success", "Timer registrado com sucesso");
+        playTimer();
+        setIsStartButton(false);
+      })
+      .catch(() => {
+        Alert.alert("Fail", "Houve um erro na hora de registrar um timer");
       });
-      setIdCurrentTimer(id);
-      playTimer();
     } else {
       playTimer();
     }
-    setIsStartButton(false);
+    setIsLoading(false);
   };
 
   const handleStopTimer = () => {
@@ -120,6 +140,7 @@ export function Home () {
               mt={4}
               shadow="4"
               onPress={handleCreateTimer}
+              isLoading={isLoading}
             >
               <Text
                 fontFamily={"body"}

@@ -1,4 +1,4 @@
-package com.petercompany;
+package com.pedrocompany;
 
 import android.os.Build;
 import android.os.Bundle;

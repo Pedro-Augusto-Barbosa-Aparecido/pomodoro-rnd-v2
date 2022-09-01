@@ -10,11 +10,11 @@
       "@react-native-firebase/app"
     ],
     "android": {
-      "package": "com.petercompany",
+      "package": "com.pedrocompany",
       "googleServicesFile": "./google-services.json"
     },
     "ios": {
-      "package": "com.petercompany",
+      "package": "com.pedrocompany",
       "googleServicesFile": "./GoogleService-Info.plist"
     }
   }

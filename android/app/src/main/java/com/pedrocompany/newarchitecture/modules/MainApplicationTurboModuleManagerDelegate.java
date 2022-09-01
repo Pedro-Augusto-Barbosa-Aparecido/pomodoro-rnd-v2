@@ -1,4 +1,4 @@
-package com.petercompany.newarchitecture.modules;
+package com.pedrocompany.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;
