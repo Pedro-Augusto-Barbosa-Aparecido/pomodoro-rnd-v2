@@ -1,4 +1,7 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { makeid } from "../utils/generateID";
 
 type Timer = {
   project: string;
@@ -16,6 +19,7 @@ interface TimerCreateParams {
 interface TimerContextType {
   timers: Timer[];
   timer: Timer | null;
+  apiIdForUser: string | null;
   createTimer: (timer: TimerCreateParams) => number;
 }
 
@@ -28,6 +32,23 @@ interface TimerContextProviderProps {
 export function TimerContextProvider ({ children }: TimerContextProviderProps) {
   const [timers, setTimers] = useState<Timer[]>([]);
   const [timer, setTimer] = useState<Timer | null>(null);
+  const [apiIdForUser, setApiIdForUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("api-key").then(data => {
+      if (!data) {
+        const id = makeid();
+        AsyncStorage.setItem("api-key", id).then(() => {
+          setApiIdForUser(() => {
+            return id;
+          });
+        });
+        
+      } else {
+        setApiIdForUser(data)
+      }
+    });
+  }, []);
 
   function createTimer ({ projectName, task }: TimerCreateParams) {
     const id = Date.now();
@@ -52,7 +73,8 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
     <TimerContext.Provider value={{
       timers,
       timer,
-      createTimer
+      createTimer,
+      apiIdForUser
     }}>
       { children }
     </TimerContext.Provider>

@@ -6,7 +6,7 @@ import { Container } from "../../components/Container";
 import { Input } from "../../components/Inputs";
 import { TimerContext } from "../../context/TimerContext";
 import { Counter } from "../../components/Counter";
-import { Alert } from "react-native";
+import { Alert, Keyboard } from "react-native";
 
 import firestore from "@react-native-firebase/firestore";
 
@@ -18,11 +18,11 @@ export function Home () {
   const [timer, setTimer] = useState<number>(0);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timer>();
   const [isStartButton, setIsStartButton] = useState<boolean>(true);
-  const [idCurrentTimer, setIdCurrentTimer] = useState<number | null>(null);
+  const [idCurrentTimer, setIdCurrentTimer] = useState<string | null>(null);
   const [isPause, setIsPause] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { createTimer } = useContext(TimerContext);
+  const { createTimer, apiIdForUser } = useContext(TimerContext);
 
   const clearTimer = () => {
     if (timerInterval) {
@@ -53,15 +53,19 @@ export function Home () {
         projectName,
         task,
         id: Date.now(),
+        time: 0,
+        userKey: apiIdForUser,
         status: "in-progress",
-        createdAt: firestore.FieldValue.serverTimestamp()
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        closedAt: ""
       })
       .then((data) => {
-        console.log(data.id);
-        setIdCurrentTimer(createTimer({
+        setIdCurrentTimer(data.id);
+        Keyboard.dismiss();
+        createTimer({
           projectName,
           task
-        }));
+        });
         Alert.alert("Success", "Timer registrado com sucesso");
         playTimer();
         setIsStartButton(false);
@@ -77,8 +81,26 @@ export function Home () {
 
   const handleStopTimer = () => {
     clearTimer();
-    setIsStartButton(true);
-    setTimer(0);
+    setIsLoading(true);
+    firestore()
+      .collection("timer")
+      .doc(idCurrentTimer)
+      .update({
+        status: "finish",
+        closedAt: firestore.FieldValue.serverTimestamp(),
+        time: timer
+      })
+      .then(() => {
+        Alert.alert("Success", "Timer encerrado com sucesso");
+        setTimer(0);
+        setIsStartButton(true);
+      })
+      .catch(() => {
+        Alert.alert("Fail", "Houve um erro ao tentar finalizar o timer");
+        handlePauseTimer();
+        setIsStartButton(false);
+      });
+    setIsLoading(false);
   };
 
   const handlePauseTimer = () => {
@@ -90,7 +112,7 @@ export function Home () {
       }
 
       return !state;
-    })
+    });
     
   };
 
@@ -158,6 +180,7 @@ export function Home () {
                   shadow="4"
                   onPress={handleStopTimer}
                   bg="red.600"
+                  isLoading={isLoading}
                   _pressed={{
                     backgroundColor: "red.500"
                   }}
