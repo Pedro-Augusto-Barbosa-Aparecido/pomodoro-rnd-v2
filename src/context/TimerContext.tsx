@@ -20,6 +20,7 @@ interface TimerContextType {
   timers: Timer[];
   timer: Timer | null;
   apiIdForUser: string | null;
+  userName: string | null;
   createTimer: (timer: TimerCreateParams) => number;
 }
 
@@ -33,6 +34,7 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
   const [timers, setTimers] = useState<Timer[]>([]);
   const [timer, setTimer] = useState<Timer | null>(null);
   const [apiIdForUser, setApiIdForUser] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem("api-key").then(data => {
@@ -47,6 +49,10 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
       } else {
         setApiIdForUser(data)
       }
+    });
+    AsyncStorage.getItem("username").then(data => {
+      if (data)
+        setUserName(data);
     });
   }, []);
 
@@ -74,7 +80,8 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
       timers,
       timer,
       createTimer,
-      apiIdForUser
+      apiIdForUser,
+      userName
     }}>
       { children }
     </TimerContext.Provider>

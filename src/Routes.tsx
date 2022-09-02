@@ -2,7 +2,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Home } from "./pages/Home";
 import { useTheme } from "native-base";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { Scroll, Timer } from "phosphor-react-native";
+import { Scroll, Timer, User } from "phosphor-react-native";
+import { Profile } from "./pages/Profile";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -26,6 +27,16 @@ export function Routes () {
               return <Timer color={color.color} size={24} />
             },
           }}  
+        />
+        <Tab.Screen 
+          name="Profile" 
+          component={Profile} 
+          options={{
+            tabBarLabel: "My Profile",
+            tabBarIcon: (color) => {
+              return <User color={color.color} size={24} />
+            },
+          }} 
         />
       </Tab.Navigator>
     </NavigationContainer>
