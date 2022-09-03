@@ -1,6 +1,6 @@
 import { Box, Center, Heading, Icon, Text, useTheme, VStack } from "native-base";
 import { Activity } from "phosphor-react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../../components/Button";
 import { Container } from "../../components/Container";
 import { Input } from "../../components/Inputs";
@@ -9,6 +9,8 @@ import { Counter } from "../../components/Counter";
 import { Alert, Keyboard } from "react-native";
 
 import firestore from "@react-native-firebase/firestore";
+import Toast from "react-native-toast-message";
+import { showToastMessage } from "../../utils/toastMessages";
 
 export function Home () {
   const { colors } = useTheme();
@@ -66,12 +68,21 @@ export function Home () {
           projectName,
           task
         });
-        Alert.alert("Success", "Timer registrado com sucesso");
+        showToastMessage({
+          message: "Timer registrado com sucesso!",
+          title: "Success",
+          visibilityTime: 3000,
+        });
         playTimer();
         setIsStartButton(false);
       })
       .catch(() => {
-        Alert.alert("Fail", "Houve um erro na hora de registrar um timer");
+        showToastMessage({
+          title: "Fail", 
+          message: "Houve um erro na hora de registrar um timer",
+          type: "error",
+          visibilityTime: 3500
+        });
       });
     } else {
       playTimer();
@@ -91,12 +102,20 @@ export function Home () {
         time: timer
       })
       .then(() => {
-        Alert.alert("Success", "Timer encerrado com sucesso");
+        showToastMessage({
+          title: "Success", 
+          message: "Timer encerrado com sucesso",
+        });
         setTimer(0);
         setIsStartButton(true);
       })
       .catch(() => {
-        Alert.alert("Fail", "Houve um erro ao tentar finalizar o timer");
+        showToastMessage({
+          title: "Fail", 
+          message: "Houve um erro ao tentar finalizar o timer",
+          type: "error"
+        
+        });
         handlePauseTimer();
         setIsStartButton(false);
       });
@@ -220,6 +239,10 @@ export function Home () {
             seconds={seconds}
           />
         </Center>
+        <Toast 
+          position="top"
+          bottomOffset={10}
+        />
       </VStack>
     </Container>
   );
