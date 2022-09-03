@@ -22,6 +22,7 @@ interface TimerContextType {
   apiIdForUser: string | null;
   userName: string | null;
   createTimer: (timer: TimerCreateParams) => number;
+  changeName: () => void;
 }
 
 export const TimerContext = createContext({} as TimerContextType);
@@ -56,6 +57,13 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
     });
   }, []);
 
+  const changeName = () => {
+    AsyncStorage.getItem("@pomodoro-username").then(data => {
+      if (data)
+        setUserName(data);
+    });
+  }
+
   function createTimer ({ projectName, task }: TimerCreateParams) {
     const id = Date.now();
     setTimer(() => {
@@ -81,7 +89,8 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
       timer,
       createTimer,
       apiIdForUser,
-      userName
+      userName,
+      changeName
     }}>
       { children }
     </TimerContext.Provider>

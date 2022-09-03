@@ -1,4 +1,4 @@
-import { Modal, Center, Heading, Text, VStack, Box, HStack, Button as CloseButton, useTheme } from "native-base";
+import { Modal, Center, Heading, Text, VStack, Box, HStack, Button as CloseButton, useTheme, ScrollView } from "native-base";
 import Toast from "react-native-toast-message";
 import { useContext, useState } from "react";
 import { Button } from "../../components/Button";
@@ -13,7 +13,7 @@ export function Profile() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [newUsername, setNewUsername] = useState<string>("");
 
-  const { userName } = useContext(TimerContext);
+  const { userName, changeName } = useContext(TimerContext);
   // const { colors } = useTheme();
 
   const msgSuccess = !userName ? "Insira um nome para poder alterar!" : "Nome alterado com sucesso!!";  
@@ -28,6 +28,7 @@ export function Profile() {
             type: "success"
           });
           setIsModalOpen(state => !state);
+          changeName();
         }).catch(() => {
           showToastMessage({
             title: "Fail",
@@ -125,7 +126,7 @@ export function Profile() {
               </VStack>
             </Box>
           </Modal>
-          <VStack
+          <ScrollView
             flex={1}
           >
             <Text
@@ -143,7 +144,7 @@ export function Profile() {
                   Nenhum nome registrado no dispositivo
                 </Heading> :
                 <ProfileInfo 
-                
+                  username={userName}
                 />
               }
               <Button
@@ -159,6 +160,6 @@ export function Profile() {
               </Button>
             </Center>
             <Toast />
-          </VStack>
+          </ScrollView>
         </Container>
 }
