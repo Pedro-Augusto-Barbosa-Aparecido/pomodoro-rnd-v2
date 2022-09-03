@@ -37,10 +37,10 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
   const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem("api-key").then(data => {
+    AsyncStorage.getItem("@pomodoro-api-key").then(data => {
       if (!data) {
         const id = makeid();
-        AsyncStorage.setItem("api-key", id).then(() => {
+        AsyncStorage.setItem("@pomodoro-api-key", id).then(() => {
           setApiIdForUser(() => {
             return id;
           });
@@ -50,7 +50,7 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
         setApiIdForUser(data)
       }
     });
-    AsyncStorage.getItem("username").then(data => {
+    AsyncStorage.getItem("@pomodoro-username").then(data => {
       if (data)
         setUserName(data);
     });
