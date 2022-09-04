@@ -57,24 +57,6 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
       if (data)
         setUserName(data);
     });
-    firestore()
-    .collection("timer")
-    .where("userKey", "==", apiIdForUser).onSnapshot(snap => {
-      const data = snap.docs.map(doc => {
-        const { userKey, closedAt, createdAt, id, projectName, status, task, time } = doc.data();
-        return {
-          userKey, 
-          closedAt,
-          createdAt,
-          id,
-          projectName, 
-          status, 
-          task,
-          time
-        }
-      });
-      setTimers(data);
-    });
   }, []);
 
   const changeName = () => {

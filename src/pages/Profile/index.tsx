@@ -30,7 +30,6 @@ export function Profile() {
     .where("userKey", "==", apiIdForUser).onSnapshot(snap => {
       const data = snap.docs.map(doc => {
         const { userKey, closedAt, createdAt, id, projectName, status, task, time } = doc.data();
-        console.log(createdAt)
         return {
           userKey, 
           closedAt,
