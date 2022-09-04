@@ -9,8 +9,8 @@ interface CardProps {
 }
 
 export function Card ({ data }: CardProps) {
-  const createdAt = data.createdAt.seconds * 1000;
-  const closedAt = data.closedAt.seconds * 1000;
+  const createdAt = data.createdAt ? data.createdAt.seconds * 1000 : 0;
+  const closedAt = data.closedAt ? data.closedAt.seconds * 1000 : 0;
 
   const { colors } = useTheme();
 
@@ -58,7 +58,7 @@ export function Card ({ data }: CardProps) {
             <Text
               color={"gray.500"}
             >
-              Criado {formatDistanceToNow(new Date(createdAt), {
+              Criado {formatDistanceToNow(new Date(createdAt || 0), {
                 addSuffix: true,
                 locale: ptBR
               })}

@@ -12,6 +12,8 @@ import firestore from "@react-native-firebase/firestore";
 import Toast from "react-native-toast-message";
 import { showToastMessage } from "../../utils/toastMessages";
 
+// const TIME_TO_SAVE_ON_DB = 1000 * 40; // 40 segundos
+
 export function Home () {
   const { colors } = useTheme();
 
@@ -19,12 +21,13 @@ export function Home () {
   const [task, setTask] = useState<string>("");
   const [timer, setTimer] = useState<number>(0);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timer>();
+  // const [timerSaveOnDB, setTimerSaveOnDB] = useState<NodeJS.Timer>();
   const [isStartButton, setIsStartButton] = useState<boolean>(true);
   const [idCurrentTimer, setIdCurrentTimer] = useState<string | null>(null);
   const [isPause, setIsPause] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { createTimer, apiIdForUser } = useContext(TimerContext);
+  const { createTimer, apiIdForUser, userName } = useContext(TimerContext);
 
   const clearTimer = () => {
     if (timerInterval) {
@@ -37,12 +40,34 @@ export function Home () {
     clearTimer();
   }
 
+  // const updateTimer = () => {
+  //   setIsLoading(true);
+  //   firestore()
+  //   .collection("timer")
+  //   .doc(idCurrentTimer)
+  //   .update({
+  //     time: timer
+  //   }).then(() => {
+  //     setIsLoading(false);
+  //   }).catch((err) => {
+  //     setIsLoading(false);
+  //     showToastMessage({
+  //       type: "error",
+  //       title: "Warning",
+  //       message: "Não foi possível atualizar o timer com a nuvem"
+  //     });
+  //   });
+  // }
+
   const playTimer = () => {
     setTimerInterval(setInterval(() => {
       setTimer(prev => {
         return prev + 1;
       });
     }, 1000));
+    // setTimerSaveOnDB(setInterval(() => {
+    //   updateTimer();
+    // }, TIME_TO_SAVE_ON_DB));
   };
 
   const handleCreateTimer = () => {
@@ -56,6 +81,7 @@ export function Home () {
         task,
         id: Date.now(),
         time: 0,
+        userName,
         userKey: apiIdForUser,
         status: "in-progress",
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -75,6 +101,7 @@ export function Home () {
         });
         playTimer();
         setIsStartButton(false);
+        setIsLoading(false);
       })
       .catch(() => {
         showToastMessage({
@@ -83,16 +110,17 @@ export function Home () {
           type: "error",
           visibilityTime: 3500
         });
+        setIsLoading(false);
       });
     } else {
       playTimer();
     }
-    setIsLoading(false);
   };
 
   const handleStopTimer = () => {
     clearTimer();
     setIsLoading(true);
+    console.log(idCurrentTimer)
     firestore()
       .collection("timer")
       .doc(idCurrentTimer)
@@ -108,6 +136,10 @@ export function Home () {
         });
         setTimer(0);
         setIsStartButton(true);
+        setIsLoading(false);
+        // if (timerSaveOnDB) {
+        //   clearInterval(timerSaveOnDB);
+        // }
       })
       .catch(() => {
         showToastMessage({
@@ -118,8 +150,8 @@ export function Home () {
         });
         handlePauseTimer();
         setIsStartButton(false);
+        setIsLoading(false);
       });
-    setIsLoading(false);
   };
 
   const handlePauseTimer = () => {

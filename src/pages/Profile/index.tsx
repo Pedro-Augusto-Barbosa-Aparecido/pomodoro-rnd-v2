@@ -1,4 +1,4 @@
-import { Modal, Heading, Text, VStack, Box, HStack, useTheme, FlatList } from "native-base";
+import { Modal, Heading, Text, VStack, Box, HStack, useTheme, FlatList, Center } from "native-base";
 import Toast from "react-native-toast-message";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "../../components/Button";
@@ -7,7 +7,7 @@ import { Input } from "../../components/Inputs";
 import { TimerContext } from "../../context/TimerContext";
 import { showToastMessage } from "../../utils/toastMessages";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { PencilSimpleLine } from "phosphor-react-native";
+import { ChatTeardropText, PencilSimpleLine } from "phosphor-react-native";
 import { ellipszeWord } from "../../utils/text";
 import { Card } from "../../components/Card";
 import { Spinner } from "../../components/Loader";
@@ -18,6 +18,7 @@ export function Profile() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [newUsername, setNewUsername] = useState<string>("");
   const [timers, setTimers] = useState([]);
+  const [isEmpty, setIsEmpty] = useState<boolean>(false);
 
   const { userName, changeName, apiIdForUser } = useContext(TimerContext);
   const { colors } = useTheme();
@@ -42,6 +43,10 @@ export function Profile() {
         }
       });
       setTimers(data);
+      if (data.length == 0) 
+        setIsEmpty(true);
+      else
+        setIsEmpty(false);
     });
   }, []);
 
@@ -207,7 +212,7 @@ export function Profile() {
               </HStack>
             </HStack>
             {
-              timers.length > 0 ?
+              timers.length > 0 || isEmpty ?
               <FlatList
                 data={timers}
                 keyExtractor={item => item.id}
@@ -215,7 +220,15 @@ export function Profile() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 100 }}
                 ListEmptyComponent={() => (
-                  <PencilSimpleLine /> 
+                  <Center
+                    flex={1}
+                  >
+                    <ChatTeardropText color={colors.gray[300]} size={40} />
+                    <Text color="gray.300" fontSize="xl" mt={6} textAlign="center">
+                      Você ainda não possui {'\n'}
+                      Timers
+                    </Text>
+                  </Center> 
                 )}
               /> :
               <Spinner />
