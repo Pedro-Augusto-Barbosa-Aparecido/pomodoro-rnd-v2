@@ -120,7 +120,6 @@ export function Home () {
   const handleStopTimer = () => {
     clearTimer();
     setIsLoading(true);
-    console.log(idCurrentTimer)
     firestore()
       .collection("timer")
       .doc(idCurrentTimer)
