@@ -1,6 +1,8 @@
 import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import firestore from "@react-native-firebase/firestore";
+
 import { makeid } from "../utils/generateID";
 
 type Timer = {
@@ -17,7 +19,7 @@ interface TimerCreateParams {
 }
 
 interface TimerContextType {
-  timers: Timer[];
+  timers: any[];
   timer: Timer | null;
   apiIdForUser: string | null;
   userName: string | null;
@@ -32,7 +34,7 @@ interface TimerContextProviderProps {
 }
 
 export function TimerContextProvider ({ children }: TimerContextProviderProps) {
-  const [timers, setTimers] = useState<Timer[]>([]);
+  const [timers, setTimers] = useState([]);
   const [timer, setTimer] = useState<Timer | null>(null);
   const [apiIdForUser, setApiIdForUser] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -54,6 +56,24 @@ export function TimerContextProvider ({ children }: TimerContextProviderProps) {
     AsyncStorage.getItem("@pomodoro-username").then(data => {
       if (data)
         setUserName(data);
+    });
+    firestore()
+    .collection("timer")
+    .where("userKey", "==", apiIdForUser).onSnapshot(snap => {
+      const data = snap.docs.map(doc => {
+        const { userKey, closedAt, createdAt, id, projectName, status, task, time } = doc.data();
+        return {
+          userKey, 
+          closedAt,
+          createdAt,
+          id,
+          projectName, 
+          status, 
+          task,
+          time
+        }
+      });
+      setTimers(data);
     });
   }, []);
 

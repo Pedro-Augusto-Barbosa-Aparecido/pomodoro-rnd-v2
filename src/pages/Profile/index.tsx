@@ -1,22 +1,50 @@
-import { Modal, Center, Heading, Text, VStack, Box, HStack, Button as CloseButton, useTheme, ScrollView } from "native-base";
+import { Modal, Heading, Text, VStack, Box, HStack, useTheme, FlatList } from "native-base";
 import Toast from "react-native-toast-message";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { Container } from "../../components/Container";
 import { Input } from "../../components/Inputs";
 import { TimerContext } from "../../context/TimerContext";
 import { showToastMessage } from "../../utils/toastMessages";
-import { ProfileInfo } from "./components/ProfileInfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PencilSimpleLine } from "phosphor-react-native";
+import { ellipszeWord } from "../../utils/text";
+import { Card } from "../../components/Card";
+import { Spinner } from "../../components/Loader";
+
+import firestore from "@react-native-firebase/firestore";
 
 export function Profile() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [newUsername, setNewUsername] = useState<string>("");
+  const [timers, setTimers] = useState([]);
 
-  const { userName, changeName } = useContext(TimerContext);
-  // const { colors } = useTheme();
+  const { userName, changeName, apiIdForUser } = useContext(TimerContext);
+  const { colors } = useTheme();
 
   const msgSuccess = !userName ? "Insira um nome para poder alterar!" : "Nome alterado com sucesso!!";  
+
+  useEffect(() => {
+    firestore()
+    .collection("timer")
+    .where("userKey", "==", apiIdForUser).onSnapshot(snap => {
+      const data = snap.docs.map(doc => {
+        const { userKey, closedAt, createdAt, id, projectName, status, task, time } = doc.data();
+        console.log(createdAt)
+        return {
+          userKey, 
+          closedAt,
+          createdAt,
+          id,
+          projectName, 
+          status, 
+          task,
+          time
+        }
+      });
+      setTimers(data);
+    });
+  }, []);
 
   const handleClick = () => {
     try {
@@ -126,40 +154,74 @@ export function Profile() {
               </VStack>
             </Box>
           </Modal>
-          <ScrollView
+          <VStack
             flex={1}
           >
-            <Text
-              fontFamily={"heading.italic"}
-              fontSize={32}
-              color="gray.500"
+            <HStack
+              alignItems={"center"}
+              justifyContent={"space-between"}
               mb={10}
+              mt={4}
             >
-              R&D Timer
-            </Text>
-            <Center>
-              {
-                !userName ? 
-                <Heading>
-                  Nenhum nome registrado no dispositivo
-                </Heading> :
-                <ProfileInfo 
-                  username={userName}
-                />
-              }
-              <Button
-                mt="4"
-                onPress={() => setIsModalOpen(state => !state)}
+              {/* <Text
+                fontFamily={"heading.italic"}
+                fontSize={32}
+                color="gray.500"
+              >
+                R&D Timer
+              </Text> */}
+              <Text
+                fontSize={20}
+                color="white"
+              >
+                {
+                  !userName ? 
+                  "Nome não registrado" : 
+                  ellipszeWord({
+                    maxCharacter: 16,
+                    str: userName
+                  })
+                }
+              </Text>
+              <HStack
+                space={2}
+                alignItems="center"
+                borderColor={"green.600"}
+                borderWidth={2}
+                borderRadius={4}
+                p={2}
               >
                 <Text
                   fontFamily={"body"}
                   fontSize="md"
                   fontWeight={"bold"}
                   color="gray.300"
-                >Editar Perfil</Text>
-              </Button>
-            </Center>
+                  onPress={() => setIsModalOpen(state => !state)}
+                  
+                >
+                  Editar Perfil
+                </Text>
+                <PencilSimpleLine 
+                  size={20}
+                  color={colors.gray[300]}
+                />
+              </HStack>
+            </HStack>
+            {
+              timers.length > 0 ?
+              <FlatList
+                data={timers}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => <Card data={item} />}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 100 }}
+                ListEmptyComponent={() => (
+                  <PencilSimpleLine /> 
+                )}
+              /> :
+              <Spinner />
+            }
             <Toast />
-          </ScrollView>
+          </VStack>
         </Container>
 }
