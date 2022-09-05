@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "timer",
+    "slug": "Pomodoro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#222222"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "@react-native-firebase/app"
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.pedrocompany",
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "package": "com.pedrocompany",
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82129a0b-8a01-42db-99af-c3e1f340f6b6"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/82129a0b-8a01-42db-99af-c3e1f340f6b6"
+    }
+  }
+}

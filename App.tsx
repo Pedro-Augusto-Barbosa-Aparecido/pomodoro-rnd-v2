@@ -23,7 +23,7 @@ export default function App() {
         flex={1}
       >
         <TimerContextProvider>
-          { fontsLoaded ? <Routes /> : <Spinner />}
+          { fontsLoaded ? <Routes /> : <Spinner background />}
         </TimerContextProvider>
       </Box>
     </NativeBaseProvider>
