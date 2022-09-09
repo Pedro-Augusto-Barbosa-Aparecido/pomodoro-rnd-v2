@@ -14,6 +14,11 @@
 > yarn install
 ```
 
+# Run project
+```
+> yarn android
+```
+
 # Preview Project
 
 <div align="center">
